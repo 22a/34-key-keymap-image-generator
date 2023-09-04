@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    :root {
+      --bg-color: #171f2e;
+      --text-color: #c0ccda;
+      --border-color: #c0ccda4f;
+      --mod-l2-color: #ef57a7;
+      --mod-l1-color: #6dc9fc;
+      --mod-shift-color: #4ade80;
+    }
+
+
+    html,
+    body {
+      /* background-color: var(--bg-color); */
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    #board {
+      width: 772px;
+      /* padding for "Capture node screenshot" borders */
+      padding: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 32px 1fr 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr;
+      gap: 8px 8px;
+      grid-template-areas:
+        ". . . . . x . . . . ."
+        ". . . . . x . . . . ."
+        ". . . . . x . . . . ."
+        "s s s . . x . . . . .";
+    }
+
+    .x {
+      grid-area: x;
+    }
+
+    .s {
+      grid-area: s;
+    }
+
+    .key {
+      background-color: var(--bg-color);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .key>* {
+      position: absolute;
+      padding: 2px;
+      font-family: monospace;
+    }
+
+    .key>.shift {
+      top: 0;
+    }
+
+    .key>.sym {
+      color: var(--mod-l1-color);
+      right: 0;
+    }
+
+    .key>.symShift {
+      color: var(--mod-shift-color);
+      right: 0;
+      top: 0;
+    }
+
+    .key>.fn {
+      color: var(--mod-l2-color);
+      left: 0;
+      bottom: 0;
+      opacity: 0.5;
+      font-size: 75%;
+    }
+
+    .key>.mod {
+      left: 0;
+      top: 0;
+      opacity: 0.5;
+    }
+
+    .key.mod-l1 {
+      color: var(--mod-l1-color);
+    }
+
+    .key.mod-l2 {
+      color: var(--mod-l2-color);
+    }
+
+    .key.mod-shift {
+      color: var(--mod-shift-color);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="board">
+    <div class="x"></div>
+    <div class="s"></div>
+  </div>
+  <script type="text/javascript">
+    const keys = [
+      {
+        defaultLayer: "Q",
+        symLayer: "1",
+        symShiftLayer: "!",
+        fnLayer: "F1"
+      },
+      {
+        defaultLayer: "W",
+        symLayer: "2",
+        symShiftLayer: "@",
+        fnLayer: "F2",
+        mod: "€"
+      },
+      {
+        defaultLayer: "E",
+        symLayer: "3",
+        symShiftLayer: "£",
+        fnLayer: "F3",
+        mod: "#"
+      },
+      {
+        defaultLayer: "R",
+        symLayer: "4",
+        symShiftLayer: "$",
+        fnLayer: "F4"
+      },
+      {
+        defaultLayer: "T",
+        symLayer: "5",
+        symShiftLayer: "%",
+        fnLayer: "F5"
+      },
+      {
+        defaultLayer: "Y",
+        symLayer: "6",
+        symShiftLayer: "^",
+        fnLayer: "F6"
+      },
+      {
+        defaultLayer: "U",
+        symLayer: "7",
+        symShiftLayer: "&",
+        fnLayer: "F7"
+      },
+      {
+        defaultLayer: "I",
+        symLayer: "8",
+        symShiftLayer: "*",
+        fnLayer: "F8"
+      },
+      {
+        defaultLayer: "O",
+        symLayer: "9",
+        symShiftLayer: "(",
+        fnLayer: "F9"
+      },
+      {
+        defaultLayer: "P",
+        symLayer: "0",
+        symShiftLayer: ")",
+        fnLayer: "F10"
+      },
+      {
+        defaultLayer: "A",
+        symLayer: "⇪",
+        fnLayer: "🔈"
+      },
+      {
+        defaultLayer: "S",
+        fnLayer: "🔊"
+      },
+      {
+        defaultLayer: "D",
+        fnLayer: "⏮"
+      },
+      {
+        defaultLayer: "F",
+        fnLayer: "⏯"
+      },
+      {
+        defaultLayer: "G",
+        fnLayer: "⏭"
+      },
+      {
+        defaultLayer: "H",
+        symLayer: "`",
+        symShiftLayer: "~",
+        fnLayer: "◀"
+      },
+      {
+        defaultLayer: "J",
+        symLayer: "-",
+        symShiftLayer: "_",
+        fnLayer: "▼"
+      },
+      {
+        defaultLayer: "K",
+        symLayer: "=",
+        symShiftLayer: "+",
+        fnLayer: "▲"
+      },
+      {
+        defaultLayer: "L",
+        symLayer: "[",
+        symShiftLayer: "{",
+        fnLayer: "▶"
+      },
+      {
+        defaultLayer: ";",
+        symLayer: "'",
+        symShiftLayer: "\"",
+        fnLayer: "F11",
+        mod: "ctrl"
+      },
+      {
+        defaultLayer: "Z",
+        fnLayer: "🔅"
+      },
+      {
+        defaultLayer: "X",
+        fnLayer: "🔆"
+      },
+      {
+        defaultLayer: "C",
+        fnLayer: "pause"
+      },
+      {
+        defaultLayer: "V",
+        fnLayer: "prtsc"
+      },
+      {
+        defaultLayer: "B",
+        fnLayer: "ins"
+      },
+      {
+        defaultLayer: "N",
+        fnLayer: "home"
+      },
+      {
+        defaultLayer: "M",
+        fnLayer: "pgdn"
+      },
+      {
+        defaultLayer: ",",
+        shiftLayer: "<",
+        fnLayer: "pgup"
+      },
+      {
+        defaultLayer: ".",
+        shiftLayer: ">",
+        symLayer: "]",
+        symShiftLayer: "}",
+        fnLayer: "end"
+      },
+      {
+        defaultLayer: "/",
+        symLayer: "\\",
+        shiftLayer: "?",
+        symShiftLayer: "|",
+        fnLayer: "F12",
+        mod: "alt",
+        modStr: "⌥"
+      },
+      {
+        defaultLayer: "TAB",
+        mod: "l2",
+        modStr: "ł2"
+      },
+      {
+        defaultLayer: "ESC",
+        mod: "l1",
+        modStr: "ł1"
+      },
+      {
+        defaultLayer: "␣",
+        symLayer: "⌫",
+        mod: "shift",
+        modStr: "⇧"
+      },
+      {
+        defaultLayer: "⮐",
+        symLayer: "⌦",
+        mod: "cmd",
+        modStr: "⌘"
+      }
+    ]
+
+    keys.forEach((key) => {
+      let keyDiv = document.createElement('div');
+      keyDiv.innerHTML = `
+        ${key.defaultLayer}
+        ${key.shiftLayer ? '<span class="shift">' + key.shiftLayer + '</span>' : ''}
+        ${key.symLayer ? '<span class="sym">' + key.symLayer + '</span>' : ''}
+        ${key.symShiftLayer ? '<span class="symShift">' + key.symShiftLayer + '</span>' : ''}
+        ${key.fnLayer ? '<span class="fn">' + key.fnLayer + '</span>' : ''}
+        ${key.mod ? '<span class="mod">' + (key.modStr || key.mod) + '</span>' : ''}
+      `.split('\n').map((s) => s.trim()).join('');
+      keyDiv.className = `key${key.mod ? ' mod-' + key.mod : ''}`;
+      document.getElementById('board').appendChild(keyDiv);
+    });
+  </script>
+</body>
+
+</html>
